@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy HiveTalk Swarm to Zeabur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e4e4e7;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        body.light-mode {
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #18181b;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        
+        body.light-mode .container {
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        body.light-mode header {
+            background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 1.4em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg) scale(1.1);
+        }
+        
+        header h1 {
+            font-size: 2.25em;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.15em;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .video-section {
+            margin-bottom: 35px;
+            text-align: center;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            margin-top: 15px;
+        }
+        
+        body.light-mode .video-wrapper {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .section {
+            margin-bottom: 35px;
+        }
+        
+        h2 {
+            color: #a78bfa;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #a78bfa;
+            padding-bottom: 8px;
+        }
+        
+        body.light-mode h2 {
+            color: #5e72e4;
+            border-bottom: 2px solid #5e72e4;
+        }
+        
+        h3 {
+            color: #c4b5fd;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        body.light-mode h3 {
+            color: #825ee4;
+        }
+        
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checklist li {
+            padding: 12px 15px 12px 55px;
+            margin-bottom: 10px;
+            background: #27272a;
+            border-radius: 6px;
+            position: relative;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        body.light-mode .checklist li {
+            background: #f8f9fa;
+        }
+        
+        .checklist li:hover {
+            background: #3f3f46;
+        }
+        
+        body.light-mode .checklist li:hover {
+            background: #e9ecef;
+        }
+        
+        .checklist li::before {
+            content: "☐";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8em;
+            color: #a78bfa;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        body.light-mode .checklist li::before {
+            color: #5e72e4;
+        }
+        
+        .checklist li.checked::before {
+            content: "☑";
+            color: #4ade80;
+        }
+        
+        body.light-mode .checklist li.checked::before {
+            color: #28a745;
+        }
+        
+        .checklist li.checked {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        
+        .code-block {
+            background: #09090b;
+            color: #e4e4e7;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            border: 1px solid #3f3f46;
+        }
+        
+        body.light-mode .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            border: none;
+        }
+        
+        .code-block code {
+            display: block;
+            white-space: pre;
+        }
+        
+        .warning {
+            background: #422006;
+            border-left: 4px solid #fbbf24;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #fef3c7;
+        }
+        
+        body.light-mode .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        .info {
+            background: #1e3a5f;
+            border-left: 4px solid #60a5fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #dbeafe;
+        }
+        
+        body.light-mode .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+        
+        .success {
+            background: #14532d;
+            border-left: 4px solid #4ade80;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #dcfce7;
+        }
+        
+        body.light-mode .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .env-vars {
+            background: #27272a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        
+        body.light-mode .env-vars {
+            background: #f8f9fa;
+        }
+        
+        .env-vars strong {
+            color: #a78bfa;
+        }
+        
+        body.light-mode .env-vars strong {
+            color: #5e72e4;
+        }
+        
+        a {
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        body.light-mode a {
+            color: #5e72e4;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            background: #27272a;
+            padding: 20px;
+            text-align: center;
+            color: #a1a1aa;
+            font-size: 0.9em;
+        }
+        
+        body.light-mode footer {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .video-section {
+                display: none;
+            }
+            
+            .theme-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                <span class="theme-icon">☀️</span>
+            </button>
+            <h1>🚀 Deploy HiveTalk Swarm to Zeabur</h1>
+            <p>One-Click Deployment Checklist & Configuration Guide</p>
+        </header>
+        
+        <div class="content">
+            <div class="video-section">
+                <h2>📺 Introduction to Zeabur (5 minutes)</h2>
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/LULtcoJ5Uy4" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📋 Prerequisites</h2>
+                <ul class="checklist">
+                    <li>Zeabur account (sign up at <a href="https://zeabur.com" target="_blank">zeabur.com</a>)</li>
+                    <li>GitHub account</li>
+                    <li>Basic understanding of environment variables</li>
+                    <li>A domain with Nostr.json configured (required - see NIP-05 service below if you don't have one)</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>🎯 Step 1: Initial Deployment</h2>
+                <ul class="checklist">
+                    <li>Go to your Zeabur dashboard</li>
+                    <li>Click "Create New Project"</li>
+                    <li>Select "Deploy from GitHub"</li>
+                    <li>Enter repository URL: <code>https://github.com/HiveTalk/swarm.git</code></li>
+                    <li>Click "Deploy" with default settings</li>
+                    <li>Wait for initial deployment to complete</li>
+                </ul>
+                
+                <div class="info">
+                    <strong>ℹ️ Note:</strong> The initial deployment uses Badger DB and filesystem for Blossom media storage. This is fine for testing but should be configured for production use.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ Step 2: Configure Essential Environment Variables</h2>
+                <ul class="checklist">
+                    <li>Navigate to your Zeabur Project dashboard</li>
+                    <li>Click on your deployed service</li>
+                    <li>Go to "Variables" or "Environment" tab</li>
+                    <li>Add/update the following required variables:</li>
+                </ul>
+                
+                <div class="env-vars">
+                    <h3>Required Variables:</h3>
+                    <div class="code-block">
+<code>NPUB_DOMAIN="yourdomain.com"
+RELAY_NAME="Your Relay Name"
+RELAY_PUBKEY="your_relay_public_key_here"
+RELAY_DESCRIPTION="Your Team Nostr relay"</code>
+                    </div>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> The <code>NPUB_DOMAIN</code> should match your domain and reference the <code>/.well-known/nostr.json</code> file to indicate which users have access.
+                </div>
+                
+                <div class="info">
+                    <strong>🔧 Don't have a domain with nostr.json yet?</strong> You can set up a NIP-05 service using the <a href="https://github.com/bitkarrot/nip05-service.git" target="_blank">nip05-service repository</a>. This will help you create and manage your <code>.well-known/nostr.json</code> file for user verification.
+                </div>
+                
+                <ul class="checklist">
+                    <li>Click "Save" or "Update" after adding variables</li>
+                    <li>Trigger a redeploy from the dashboard</li>
+                </ul>
+                
+                <h3>Setup Public Domain</h3>
+                <img src="public/domain-zeabur.png" alt="Domain Setup" style="max-width: 100%; height: auto;">
+                <ul class="checklist">
+                    <li>Navigate to the "Networking" tab in your service dashboard</li>
+                    <li>Verify the port is set to <code>3334</code> (HTTP)</li>
+                    <li>Under "Public" section, click "Generate Domain" for an automatic domain, or click "Custom Domain" to use your own</li>
+                    <li>Wait for the domain to be activated</li>
+                </ul>
+                
+                <div class="info">
+                    <strong>💡 Domain Setup:</strong> Your relay needs a publicly accessible domain to function. Zeabur can generate one automatically (e.g., swarm123.zeabur.app) or you can configure your own custom domain.
+                    <div style="margin-top: 10px; text-align: center;">
+                        <img src="https://raw.githubusercontent.com/user-attachments/assets/networking-tab-example.png" alt="Zeabur Networking Tab" style="max-width: 100%; border-radius: 8px; border: 1px solid #3f3f46;" onerror="this.style.display='none'">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🗄️ Step 3: Optional Database Configuration</h2>
+                <p>For production use, consider upgrading from the default Badger DB:</p>
+                
+                <h3>Option A: Zeabur PostgreSQL (Recommended for beginners)</h3>
+                <ul class="checklist">
+                    <li>In your Zeabur project, click "Add Service"</li>
+                    <li>Select "PostgreSQL" from the marketplace</li>
+                    <li>Wait for PostgreSQL to provision</li>
+                    <li>Zeabur will automatically inject database connection variables</li>
+                    <li>Redeploy your application</li>
+                </ul>
+                
+                <h3>Option B: External PostgreSQL (Neon.com)</h3>
+                <ul class="checklist">
+                    <li>Sign up at <a href="https://neon.tech" target="_blank">neon.tech</a></li>
+                    <li>Create a new database</li>
+                    <li>Copy the connection string</li>
+                    <li>Add <code>DATABASE_URL</code> to your Zeabur environment variables</li>
+                    <li>Redeploy your application</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>📦 Step 4: Optional S3 Storage Configuration</h2>
+                <p>Replace filesystem storage with S3-compatible storage for Blossom media:</p>
+                
+                <h3>Using Tigris Data</h3>
+                <ul class="checklist">
+                    <li>Sign up at <a href="https://www.tigrisdata.com" target="_blank">tigrisdata.com</a></li>
+                    <li>Create a new bucket</li>
+                    <li>Generate access credentials</li>
+                    <li>Add S3 configuration to Zeabur environment variables:</li>
+                </ul>
+                
+                <div class="code-block">
+<code>S3_ENDPOINT="your_s3_endpoint"
+S3_BUCKET="your_bucket_name"
+S3_ACCESS_KEY="your_access_key"
+S3_SECRET_KEY="your_secret_key"</code>
+                </div>
+                
+                <ul class="checklist">
+                    <li>Save variables and redeploy</li>
+                </ul>
+                
+                <div class="info">
+                    <strong>💡 Pro Tip:</strong> Zeabur's AI assistant can guide you through setting up PostgreSQL and S3 storage directly in the dashboard!
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>✅ Step 5: Verify Deployment</h2>
+                <ul class="checklist">
+                    <li>Check deployment logs for any errors</li>
+                    <li>Visit your deployed application URL</li>
+                    <li>Verify relay name and description appear correctly</li>
+                    <li>Test basic functionality</li>
+                    <li>Confirm user access via <code>/.well-known/nostr.json</code></li>
+                </ul>
+                
+                <div class="success">
+                    <strong>🎉 Success!</strong> Your HiveTalk Swarm relay is now deployed and configured on Zeabur!
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔗 Useful Resources</h2>
+                <ul class="checklist">
+                    <li><a href="https://github.com/HiveTalk/swarm" target="_blank">HiveTalk Swarm GitHub Repository</a></li>
+                    <li><a href="https://github.com/bitkarrot/nip05-service.git" target="_blank">NIP-05 Service (for nostr.json setup)</a></li>
+                    <li><a href="https://zeabur.com/docs" target="_blank">Zeabur Documentation</a></li>
+                    <li><a href="https://neon.tech" target="_blank">Neon PostgreSQL</a></li>
+                    <li><a href="https://www.tigrisdata.com" target="_blank">Tigris Data S3 Storage</a></li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>🆘 Troubleshooting</h2>
+                <div class="warning">
+                    <strong>Common Issues:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>If deployment fails, check the logs in Zeabur dashboard</li>
+                        <li>Ensure all required environment variables are set correctly</li>
+                        <li>Verify your domain's <code>.well-known/nostr.json</code> file is accessible</li>
+                        <li>For database connection issues, verify your DATABASE_URL format</li>
+                        <li>For S3 issues, confirm your credentials and endpoint are correct</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>📄 HiveTalk Swarm v0.0.8+ | Deployment Guide for Zeabur</p>
+            <p style="margin-top: 5px; font-size: 0.85em;">For support, visit the GitHub repository or Zeabur community</p>
+        </footer>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-icon');
+            
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Interactive checklist functionality
+        function initChecklist() {
+            const checklistItems = document.querySelectorAll('.checklist li');
+            
+            checklistItems.forEach((item, index) => {
+                // Load saved state
+                const isChecked = localStorage.getItem(`checklist-${index}`) === 'true';
+                if (isChecked) {
+                    item.classList.add('checked');
+                }
+                
+                // Add click handler
+                item.addEventListener('click', function() {
+                    this.classList.toggle('checked');
+                    const checked = this.classList.contains('checked');
+                    localStorage.setItem(`checklist-${index}`, checked);
+                });
+                
+                // Make it keyboard accessible
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('role', 'checkbox');
+                item.setAttribute('aria-checked', isChecked);
+                
+                item.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        }
+        
+        // Load saved theme preference and initialize checklist
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.querySelector('.theme-icon');
+            
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '🌙';
+            }
+            
+            initChecklist();
+        });
+    </script>
+</body>
+</html>
