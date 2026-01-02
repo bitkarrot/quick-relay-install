@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deploy HiveTalk Swarm to Zeabur</title>
+    <title>Deploy a Swarm Nostr Relay to Zeabur</title>
     <style>
         * {
             margin: 0;
@@ -343,10 +343,39 @@
             <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
                 <span class="theme-icon">☀️</span>
             </button>
-            <h1>🚀 Deploy HiveTalk Swarm to Zeabur</h1>
+            <h1>🚀 Deploy Swarm Nostr Relay to Zeabur</h1>
             <p>One-Click Deployment Checklist & Configuration Guide</p>
         </header>
-        
+
+             <div class="content">
+            <div class="section">
+                <h2>📡 What is Swarm?</h2>
+                <p style="margin-bottom: 20px;"><strong>Swarm</strong> is a private Nostr relay with integrated Blossom media server for teams. 
+                    Control access via your domain's <code>.well-known/nostr.json</code>, configure user access or custom permissions,
+                     and sync media between relays via an embedded bouquet client. Works with any Nostr client. Includes a link to the 
+                    Curator client to help quickly check relay content and post kind 1 notes.</p>
+                
+                <div class="video-section" style="margin-top: 25px;">
+                    <h3 style="text-align: center; margin-bottom: 15px;">🎥 Swarm Relay Demo</h3>
+                    <div class="video-wrapper">
+                        <video controls style="width: 100%; max-width: 800px; margin: 0 auto; display: block;">
+                            <source src="public/overview.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Prerequisites</h2>
+                <ul class="checklist">
+                    <li>Zeabur account (sign up at <a href="https://zeabur.com" target="_blank">zeabur.com</a>)</li>
+                    <li>GitHub account</li>
+                    <li>Basic understanding of environment variables</li>
+                    <li>A domain with Nostr.json configured (required - see NIP-05 service below if you don't have one)</li>
+                </ul>
+            </div>
+
         <div class="content">
             <div class="video-section">
                 <h2>📺 Introduction to Zeabur (5 minutes)</h2>
@@ -359,17 +388,7 @@
                     </iframe>
                 </div>
             </div>
-            
-            <div class="section">
-                <h2>📋 Prerequisites</h2>
-                <ul class="checklist">
-                    <li>Zeabur account (sign up at <a href="https://zeabur.com" target="_blank">zeabur.com</a>)</li>
-                    <li>GitHub account</li>
-                    <li>Basic understanding of environment variables</li>
-                    <li>A domain with Nostr.json configured (required - see NIP-05 service below if you don't have one)</li>
-                </ul>
-            </div>
-            
+                        
             <div class="section">
                 <h2>🎯 Step 1: Initial Deployment</h2>
                 <ul class="checklist">
@@ -388,6 +407,12 @@
             
             <div class="section">
                 <h2>⚙️ Step 2: Configure Essential Environment Variables</h2>
+                
+                <video width="100%" height="500" controls>
+                    <source src="public/variables.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
                 <ul class="checklist">
                     <li>Navigate to your Zeabur Project dashboard</li>
                     <li>Click on your deployed service</li>
@@ -466,17 +491,29 @@ RELAY_DESCRIPTION="Your Team Nostr relay"</code>
                 <ul class="checklist">
                     <li>Sign up at <a href="https://www.tigrisdata.com" target="_blank">tigrisdata.com</a></li>
                     <li>Create a new bucket</li>
-                    <li>Generate access credentials</li>
+                    <li>Generate access credentials, make sure you have write access granted to the bucket</li>
                     <li>Add S3 configuration to Zeabur environment variables:</li>
                 </ul>
                 
                 <div class="code-block">
-<code>S3_ENDPOINT="your_s3_endpoint"
+                    <code>
+S3_ENDPOINT="your_s3_endpoint"
 S3_BUCKET="your_bucket_name"
 S3_ACCESS_KEY="your_access_key"
-S3_SECRET_KEY="your_secret_key"</code>
+S3_SECRET_KEY="your_secret_key"
+                </code>
                 </div>
                 
+                <ul class="checklist">
+                    <li> Also remember to update Blossom configuration:
+                    </li>
+                </ul>
+                          <div class="code-block">
+                            <code>
+BLOSSOM_ENABLED=true
+BLOSSOM_URL=https://swarm123.zeabur.app (use your actual deployed URL)
+                            </code>
+                          </div>
                 <ul class="checklist">
                     <li>Save variables and redeploy</li>
                 </ul>
@@ -497,7 +534,7 @@ S3_SECRET_KEY="your_secret_key"</code>
                 </ul>
                 
                 <div class="success">
-                    <strong>🎉 Success!</strong> Your HiveTalk Swarm relay is now deployed and configured on Zeabur!
+                    <strong>🎉 Success!</strong> Your Swarm Nostr relay is now deployed and configured on Zeabur!
                 </div>
             </div>
             
